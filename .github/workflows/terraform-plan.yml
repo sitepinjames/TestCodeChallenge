@@ -1,0 +1,77 @@
+name: Terraform PLAN
+
+on:
+  workflow_dispatch:  # Allows manual triggering of apply
+    inputs:
+      image_tag:
+        description: 'Please Enter the image tag'
+        required: true
+        default: 'latest'
+
+
+
+permissions:
+  contents: read
+
+jobs:
+  Plan:
+    name: Terraform Validation
+    runs-on: ubuntu-latest
+    env:
+         AWS_ACCESS_KEY_ID: ${{ secrets.ACCESSKEY }}
+         AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRETKEY }}
+         IMAGE_TAG: ${{ github.event.inputs.image_tag }}
+    outputs:
+      plan-status: ${{ steps.plan.outcome }}
+
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.13.3
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
+
+      - name: Terraform Format Check
+        run:  terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run:  terraform init
+
+      - name: Terraform Validate
+        run:  terraform validate
+        
+      - name: Terraform Plan
+        id  : plan
+        run:  terraform plan -var-file="terraform.tfvars" -var="image_tag=${IMAGE_TAG}" -out=tfplan.binary -no-color -input=false
+        
+      - name: Upload Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+         name: tfplan
+         path: tfplan.binary
+      - name: Upload tfplan.binary to S3
+        run: aws s3 cp tfplan.binary s3://codechalllengetfstate/tfplan.binary
+
+
+  
+  
+  
+  
+  
+
+  
+  
+
+  
+  
+
+
+
+  
+
