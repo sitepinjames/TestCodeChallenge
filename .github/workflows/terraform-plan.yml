@@ -38,7 +38,7 @@ jobs:
         run: aws sts get-caller-identity   
 
       - name: Download terraform.tfvars from S3
-        run: aws s3 cp terraform.tfvars s3://codechalllengetfstate/terraform.tfvars terraform.tfvars 
+        run: aws s3 cp s3://codechalllengetfstate/terraform.tfvars terraform.tfvars 
 
       - name: Terraform Format Check
         run:  terraform fmt -check -recursive
