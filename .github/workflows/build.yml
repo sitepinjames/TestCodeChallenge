@@ -6,7 +6,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: flashk-container
+  ECR_REPOSITORY: flash-container
 
 jobs:
   build-and-push:
