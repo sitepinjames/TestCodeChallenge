@@ -1,44 +1,60 @@
-from flask import Flask
+from flask import Flask, render_template_string
 app = Flask(__name__)
 
+with open("README.md", "r") as f:
+    readme_content = f.read()
 @app.route("/")
 def home():
-    return """
-<html>
-  <head>
-    <title>Flashweb Deployed</title>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        background: radial-gradient(circle at center, #000000, #1f1c2c);
-        color: #ff4d4d;
-        font-family: 'Creepster', cursive;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        text-align: center;
-        background-image: url('https://www.transparenttextures.com/patterns/skulls.png');
-      }
-      h1 {
-        font-size: 4em;
-        animation: flicker 1.5s infinite;
-        text-shadow: 0 0 10px #ff4d4d, 0 0 20px #ff0000;
-      }
-      @keyframes flicker {
-        0% { opacity: 1; }
-        50% { opacity: 0.6; }
-        100% { opacity: 1; }
-      }
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <h1>Welcome to Flashweb</h1>
-    <p>The shadows are stirring… Halloween is almost here!</p>
-  </body>
-</html>
-"""
+    return render_template_string("""
+    <html>
+    <head>
+        <title>Infra Tag Gate</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', sans-serif;
+                background-color: #fff8b3; /* soft yellow */
+                padding: 40px;
+                line-height: 1.6;
+                animation: fadeIn 1.5s ease-in;
+            }
+            .content-box {
+                background: #ffffff;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                white-space: pre-wrap;
+                animation: slideUp 1s ease-out;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes slideUp {
+                from { transform: translateY(20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class="fade-in">🚀 Infra Tag Gate Demo</h1>
+        <div class="content-box">{{ content }}</div>
+    </body>
+    </html>
+    """, content=readme_content)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80)
+    app.run(host="0.0.0.0", port=80)
+
