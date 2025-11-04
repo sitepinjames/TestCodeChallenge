@@ -1,47 +1,71 @@
 from flask import Flask, render_template_string
+
 app = Flask(__name__)
 
-with open("README.md", "r") as f:
-    readme_content = f.read()
 @app.route("/")
 def home():
     return render_template_string("""
     <html>
     <head>
-        <title>Infra Tag Gate</title>
+        <title>Fun Animation</title>
         <style>
             body {
-                font-family: 'Segoe UI', sans-serif;
-                background-color: #fff8b3; /* soft yellow */
-                padding: 40px;
-                line-height: 1.6;
-                animation: fadeIn 1.5s ease-in;
+                margin: 0;
+                overflow: hidden;
+                background-color: black;
+                height: 100vh;
+                width: 100vw;
+                font-family: 'Arial', sans-serif;
+                position: relative;
             }
-            .content-box {
-                background: #ffffff;
-                padding: 30px;
-                border-radius: 10px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
-                white-space: pre-wrap;
-                animation: slideUp 1s ease-out;
+            /* Big festive message with emojis */
+            .message {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 3em;
+                color: orange;
+                font-weight: bold;
+                text-shadow: 0 0 20px #ff6600, 0 0 30px #ff6600;
+                z-index: 10;
+                text-align: center;
+                padding: 20px;
             }
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
+            /* Floating circles with glow effect */
+            .circle {
+                position: absolute;
+                border-radius: 50%;
+                background: radial-gradient(circle, #ffcc00, #ff6600);
+                opacity: 0.8;
+                animation: float 10s infinite ease-in-out;
             }
-            @keyframes slideUp {
-                from { transform: translateY(20px); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
+            /* Generate multiple circles with different sizes and positions */
+            {% for i in range(20) %}
+            .circle:nth-child({{ i+1 }}) {
+                width: {{ (i+1) * 10 }}px;
+                height: {{ (i+1) * 10 }}px;
+                top: {{ (i*5) % 100 }}%;
+                left: {{ (i*7) % 100 }}%;
+                animation-delay: {{ i * 0.5 }}s;
+            }
+            {% endfor %}
+            @keyframes float {
+                0%, 100% { transform: translateY(0) translateX(0); }
+                50% { transform: translateY(-20px) translateX(20px); }
             }
         </style>
     </head>
     <body>
-        <h1 class="spooky-title">         👻 HAPPY HALLOWEEN CODE TEST CHALLENGE 🎃</h1>
-        <div class="content-box">{{ content }}</div>
+        <!-- Awesome Halloween message with emojis -->
+        <div class="message">👻 HAPPY HALLOWEEN CODE TEST CHALLENGE 🎃</div>
+        <!-- Floating circles -->
+        {% for i in range(20) %}
+        <div class="circle"></div>
+        {% endfor %}
     </body>
     </html>
-    """, content=readme_content)
+    """)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=80)
-
