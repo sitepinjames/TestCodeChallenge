@@ -86,5 +86,6 @@ Container & Port Configuration
 Application Port: 80 (Flask runs on port 80 inside the container)
 ECS Task Port Mapping: Container port 80 mapped to host port 80
 Health Check: ALB monitors root endpoint for a 200 OK response
+
 Image Details
 ECR Image Tag: 279c09 (passed via Terraform -var="image_tag=279c09")
