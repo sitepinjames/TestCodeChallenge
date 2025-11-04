@@ -1,4 +1,5 @@
 CodeChallenge Deployment
+
 Hello Folks!
 
 Here's an overview of my CodeChallenge project. What seemed straightforward initially turned out to be quite engaging. It was my first experience deploying on ECS, which added a layer of complexity, but I thoroughly enjoyed the process.
@@ -68,7 +69,7 @@ Post-Deploy Checks: After deployment, the system performs a verification test to
 Public Access:
 
 URL: http://flashapp.jamesitepin.com
-Port: 443 (HTTP)
+Port: 80 (HTTP)
 This verifies DNS routing, Application Load Balancer (ALB) configuration, and container health.
 
 CloudWatch Alarm:
