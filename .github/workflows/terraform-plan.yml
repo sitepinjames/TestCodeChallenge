@@ -6,7 +6,6 @@ on:
       image_tag:
         description: 'Please Enter the image tag'
         required: true
-        default: 'latest'
 
 
 
