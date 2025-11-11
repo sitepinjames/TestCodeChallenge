@@ -1,6 +1,10 @@
 name: Deploy to ECS
 on:
   workflow_dispatch:  # Manual trigger
+   inputs:
+    image_tag:
+      description: 'Please Enter the image tag you would like to deploy'
+      required: true
 
 env:
   AWS_REGION: us-east-1
@@ -8,11 +12,17 @@ env:
   SERVICE_NAME: CodeChallengeCluster-service
   ECR_REPOSITORY: flash-container
   IMAGE_TAG: ${{ github.sha }}
+  CONTAINER_NAME: flashweb
+  TASK_FAMILY: CodeChallengeCluster-task
+  IMAGE_TAG: ${{ github.event.inputs.image_tag }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -20,10 +30,33 @@ jobs:
           aws-secret-access-key: ${{ secrets.SECRETKEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Get current task definition
+        id: task-def
+        run: |
+          aws ecs describe-task-definition --task-definition $TASK_FAMILY --query "taskDefinition.{family:family, taskRoleArn:taskRoleArn, executionRoleArn:executionRoleArn, networkMode:networkMode, containerDefinitions:containerDefinitions, volumes:volumes, placementConstraints:placementConstraints, requiresCompatibilities:requiresCompatibilities, cpu:cpu, memory:memory}" --output json > task-def.json
+      
+      - name: Update image tag in task definition
+        run: |
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
+          jq --arg IMAGE_URI "$IMAGE_URI" \
+             --arg CONTAINER_NAME "$CONTAINER_NAME" \
+             '.containerDefinitions |= map(if .name == $CONTAINER_NAME then .image = $IMAGE_URI else . end)' \
+             task-def.json > new-task-def.json
+
+      - name: Register new task definition revision
+        id: register     
+        run: |
+          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+             --cli-input-json file://new-task-def.json \
+             --query 'taskDefinition.taskDefinitionArn' \
+             --output text)
+          echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV  
+          
       - name: Force ECS deployment
         run: |
           aws ecs update-service \
             --cluster $CLUSTER_NAME \
             --service $SERVICE_NAME \
+            --task-definition $NEW_TASK_DEF_ARN \
             --force-new-deployment \
             --region $AWS_REGION

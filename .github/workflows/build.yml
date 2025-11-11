@@ -27,8 +27,16 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
 
+      # - name: Set IMAGE_TAG from Git SHA
+        # run: echo "IMAGE_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: Set IMAGE_TAG from Git SHA
-        run: echo "IMAGE_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            SHORT_SHA=$(echo "${{ github.event.pull_request.head.sha }}" | cut -c1-7)
+            echo "IMAGE_TAG=$SHORT_SHA" >> $GITHUB_ENV
+          else
+            echo "IMAGE_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          fi
 
       - name: Build Docker image
         run: docker build -t $ECR_REPOSITORY:$IMAGE_TAG ./docker

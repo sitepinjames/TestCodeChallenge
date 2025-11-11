@@ -58,7 +58,7 @@ def home():
     </head>
     <body>
         <!-- Awesome Halloween message with emojis -->
-        <div class="message">👻 HellO AND  HAPPY HALLOWEEN CODE TEST CHALLENGE 🎃</div>
+        <div class="message">👻 HellO FRIENDS AND  HAPPY HALLOWEEN CODE TEST CHALLENGE 🎃</div>
         <!-- Floating circles -->
         {% for i in range(20) %}
         <div class="circle"></div>
