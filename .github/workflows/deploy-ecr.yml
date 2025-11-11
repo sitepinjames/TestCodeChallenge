@@ -1,6 +1,6 @@
 name: Deploy to ECS
 on:
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:  # trigger it Manually
    inputs:
     image_tag:
       description: 'Please Enter the image tag you would like to deploy'
